@@ -4,6 +4,7 @@ import {
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 import {getFirestore, doc, getDoc, setDoc} from "firebase/firestore";
 
@@ -19,31 +20,53 @@ const firebaseConfig = {
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({
+//? CAN CONFIG DIFERENT PROVIDERS (FACEBOOK, GOOGLE, GITHUB, ETC)
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
   prompt: "select_account",
 });
 
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
-// export cons signInWithGoogleRedirect = () => signInWithRedirect()
+
+//? TWO DIFERENT WAYS TO LOGIN WITH GOOGLE (REDIRECT & POPUP)
+
+//---------------------
+export const signInWithGooglePopup = () =>
+  signInWithPopup(auth, googleProvider);
+
+export const signInWithGoogleRedirect = () =>
+  signInWithRedirect(auth, googleProvider);
+//--------------------
+
+//? THIS PART IS THE SAME FOR REDIRECT OR POPUP
 
 export const db = getFirestore();
 
-export const createUserFromAuth = async (UserAuth) => {
+export const createUserFromAuth = async (UserAuth, additionalInfo) => {
   const userDocRef = doc(db, "users", UserAuth.uid);
 
   const userSnapshot = await getDoc(userDocRef);
 
+  //? SEACHES FOR THE USER IN THE DB IF IT DOESN'T FIND IT THE DOCUMENT IS CREATED
   if (!userSnapshot.exists()) {
     const {displayName, email} = UserAuth;
     const createdAt = new Date();
 
     try {
-      await setDoc(userDocRef, {displayName, email, createdAt});
+      await setDoc(userDocRef, {
+        displayName,
+        email,
+        createdAt,
+        ...additionalInfo,
+      });
     } catch (error) {
       console.log("error creating the user", error.message);
     }
   }
   return userDocRef;
+};
+
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+  return createUserWithEmailAndPassword(auth, email, password);
 };
