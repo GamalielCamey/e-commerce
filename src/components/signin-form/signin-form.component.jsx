@@ -8,6 +8,7 @@ import {
 } from "../../utils/firebase/firebase.utils";
 
 import "./signin-form.styles.scss";
+
 const defaultFormFields = {
   email: "",
   password: "",
@@ -18,8 +19,7 @@ const SignInForm = () => {
   const {email, password} = formFields;
 
   const signInGoogle = async () => {
-    const {user} = await signInWithGooglePopup();
-    await createUserFromAuth(user);
+    await signInWithGooglePopup();
   };
 
   const handleChange = (event) => {
