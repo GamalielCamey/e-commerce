@@ -1,4 +1,4 @@
-import {Link, Outlet} from "react-router-dom";
+import {Outlet} from "react-router-dom";
 import {Fragment, useContext} from "react";
 import {ReactComponent as CrwnLogo} from "../../assets/crown.svg";
 import {signOutUser} from "../../utils/firebase/firebase.utils";
@@ -9,7 +9,14 @@ import {CartContext} from "../../contexts/cart.contexts";
 import CartIcon from "../../components/cart-icon/cart-icon.component";
 import CartDropdown from "../../components/cart-dropdown/cart-dropdown.component";
 
-import "./navigation.styles.scss";
+//? HERE WE USE STYLED COMPONENTS AS A WAY TO SHOW HOW THEY WORK AND UNDERSTAND THE BENEFITS OF THIS COMPONENTS TO AVOID ANY STYLE CLASHES THROUGHOUT THE PAGE
+
+import {
+  NavLink,
+  NavigationContainer,
+  NavLinks,
+  LogoContainer,
+} from "./navigation.styles";
 
 const NavBar = () => {
   const {currentUser} = useContext(UserContext);
@@ -17,28 +24,24 @@ const NavBar = () => {
 
   return (
     <Fragment>
-      <div className="navigation">
-        <Link className="logo-container" to="/">
+      <NavigationContainer>
+        <LogoContainer to="/">
           <CrwnLogo />
-        </Link>
-        <div className="nav-links-container">
-          <Link className="nav-link" to="/shop">
-            SHOP
-          </Link>
+        </LogoContainer>
+        <NavLinks>
+          <NavLink to="/shop">SHOP</NavLink>
 
           {!currentUser ? (
-            <Link className="nav-link" to="/auth">
-              SIGN IN
-            </Link>
+            <NavLink to="/auth">SIGN IN</NavLink>
           ) : (
-            <span className="nav-link" onClick={signOutUser}>
+            <NavLink as="span" onClick={signOutUser}>
               SIGN OUT
-            </span>
+            </NavLink>
           )}
           <CartIcon />
-        </div>
+        </NavLinks>
         {toggle && <CartDropdown />}
-      </div>
+      </NavigationContainer>
       <Outlet />
     </Fragment>
   );
